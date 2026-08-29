@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import DashboardLayout from './layouts/DashboardLayout';
 import Dashboard from './pages/Dashboard';
+import Pipeline from './pages/Pipeline';
 import Leads from './pages/Leads';
 import Contacts from './pages/Contacts';
 import Companies from './pages/Companies';
@@ -21,6 +22,7 @@ function App() {
         {/* Protected Routes inside DashboardLayout */}
         <Route path="/" element={isAuthenticated ? <DashboardLayout /> : <Navigate to="/login" />}>
           <Route path="dashboard" element={<Dashboard />} />
+          <Route path="pipeline" element={<Pipeline />} />
           <Route path="leads" element={<Leads />} />
           <Route path="contacts" element={<Contacts />} />
           <Route path="companies" element={<Companies />} />

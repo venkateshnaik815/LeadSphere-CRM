@@ -1,0 +1,11 @@
+CREATE TABLE opportunities (
+    id UUID PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    amount DECIMAL(15, 2) NOT NULL DEFAULT 0.00,
+    stage VARCHAR(50) NOT NULL,
+    close_date DATE,
+    company_id UUID REFERENCES companies(id) ON DELETE SET NULL,
+    assigned_user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

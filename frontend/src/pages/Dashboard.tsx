@@ -8,14 +8,14 @@ const Dashboard: React.FC = () => {
     const { data: opportunities } = useGetOpportunitiesQuery({});
     const { data: companies } = useGetCompaniesQuery({});
 
-    const totalPipelineValue = opportunities?.reduce((acc, curr) => acc + (curr.amount || 0), 0) || 0;
+    const totalPipelineValue = opportunities?.reduce((acc: number, curr: any) => acc + (curr.amount || 0), 0) || 0;
     
     const stageData = [
-        { name: 'Prospecting', count: opportunities?.filter(o => o.stage === 'PROSPECTING').length || 0 },
-        { name: 'Qualification', count: opportunities?.filter(o => o.stage === 'QUALIFICATION').length || 0 },
-        { name: 'Proposal', count: opportunities?.filter(o => o.stage === 'PROPOSAL').length || 0 },
-        { name: 'Negotiation', count: opportunities?.filter(o => o.stage === 'NEGOTIATION').length || 0 },
-        { name: 'Won', count: opportunities?.filter(o => o.stage === 'CLOSED_WON').length || 0 }
+        { name: 'Prospecting', count: opportunities?.filter((o: any) => o.stage === 'PROSPECTING').length || 0 },
+        { name: 'Qualification', count: opportunities?.filter((o: any) => o.stage === 'QUALIFICATION').length || 0 },
+        { name: 'Proposal', count: opportunities?.filter((o: any) => o.stage === 'PROPOSAL').length || 0 },
+        { name: 'Negotiation', count: opportunities?.filter((o: any) => o.stage === 'NEGOTIATION').length || 0 },
+        { name: 'Won', count: opportunities?.filter((o: any) => o.stage === 'CLOSED_WON').length || 0 }
     ];
 
     const stats = [
@@ -68,7 +68,7 @@ const Dashboard: React.FC = () => {
                     <h2 className="text-lg font-medium text-gray-900 mb-4">Recent Opportunities</h2>
                     <div className="flow-root">
                         <ul role="list" className="-my-5 divide-y divide-gray-100">
-                            {opportunities?.slice(0, 5).map((opp) => (
+                            {opportunities?.slice(0, 5).map((opp: any) => (
                                 <li key={opp.id} className="py-4 flex items-center justify-between">
                                     <div className="flex flex-col">
                                         <p className="text-sm font-semibold text-gray-900">{opp.title}</p>

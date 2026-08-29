@@ -21,6 +21,7 @@ const DashboardLayout: React.FC = () => {
         </div>
         <nav className="flex-1 px-4 py-6 space-y-2">
           <Link to="/dashboard" className="block px-4 py-2 rounded hover:bg-gray-800">Dashboard</Link>
+          <Link to="/pipeline" className="block px-4 py-2 rounded hover:bg-gray-800">Pipeline</Link>
           <Link to="/leads" className="block px-4 py-2 rounded hover:bg-gray-800">Leads</Link>
           <Link to="/contacts" className="block px-4 py-2 rounded hover:bg-gray-800">Contacts</Link>
           <Link to="/companies" className="block px-4 py-2 rounded hover:bg-gray-800">Companies</Link>

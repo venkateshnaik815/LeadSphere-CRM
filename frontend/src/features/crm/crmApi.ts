@@ -29,6 +29,69 @@ export const crmApi = api.injectEndpoints({
       }),
       invalidatesTags: ['Opportunity'],
     }),
+    addOpportunity: builder.mutation({
+      query: (opportunity) => ({
+        url: '/opportunities',
+        method: 'POST',
+        body: opportunity,
+      }),
+      invalidatesTags: ['Opportunity'],
+    }),
+    addLead: builder.mutation({
+      query: (lead) => ({
+        url: '/leads',
+        method: 'POST',
+        body: lead,
+      }),
+      invalidatesTags: ['Lead'],
+    }),
+    addContact: builder.mutation({
+      query: (contact) => ({
+        url: '/contacts',
+        method: 'POST',
+        body: contact,
+      }),
+      invalidatesTags: ['Contact'],
+    }),
+    addCompany: builder.mutation({
+      query: (company) => ({
+        url: '/companies',
+        method: 'POST',
+        body: company,
+      }),
+      invalidatesTags: ['Company'],
+    }),
+    updateLead: builder.mutation({
+      query: ({ id, ...lead }) => ({
+        url: `/leads/${id}`,
+        method: 'PUT',
+        body: lead,
+      }),
+      invalidatesTags: ['Lead'],
+    }),
+    updateContact: builder.mutation({
+      query: ({ id, ...contact }) => ({
+        url: `/contacts/${id}`,
+        method: 'PUT',
+        body: contact,
+      }),
+      invalidatesTags: ['Contact'],
+    }),
+    updateCompany: builder.mutation({
+      query: ({ id, ...company }) => ({
+        url: `/companies/${id}`,
+        method: 'PUT',
+        body: company,
+      }),
+      invalidatesTags: ['Company'],
+    }),
+    deleteOpportunity: builder.mutation({
+      query: (id) => ({
+        url: `/opportunities/${id}`,
+        method: 'DELETE',
+      }),
+      invalidatesTags: ['Opportunity'],
+    }),
   }),
 });
 
@@ -37,5 +100,13 @@ export const {
     useGetContactsQuery, 
     useGetCompaniesQuery,
     useGetOpportunitiesQuery,
-    useUpdateOpportunityStageMutation
+    useUpdateOpportunityStageMutation,
+    useAddOpportunityMutation,
+    useAddLeadMutation,
+    useAddContactMutation,
+    useAddCompanyMutation,
+    useUpdateLeadMutation,
+    useUpdateContactMutation,
+    useUpdateCompanyMutation,
+    useDeleteOpportunityMutation
 } = crmApi;

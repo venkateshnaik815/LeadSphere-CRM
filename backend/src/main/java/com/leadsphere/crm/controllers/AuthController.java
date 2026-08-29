@@ -47,24 +47,33 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+        try {
+            String email = loginRequest.getEmail() != null ? loginRequest.getEmail().trim() : "";
+            System.out.println("ATTEMPTING LOGIN FOR: '" + email + "' with password length: " + (loginRequest.getPassword() != null ? loginRequest.getPassword().length() : 0));
+            
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, loginRequest.getPassword()));
 
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            String jwt = jwtUtils.generateJwtToken(authentication);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+            UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+            System.out.println("LOGIN SUCCESSFUL FOR: " + email);
 
-        return ResponseEntity.ok(new JwtResponse(jwt,
-                userDetails.getId(),
-                userDetails.getEmail(),
-                userDetails.getFirstName(),
-                userDetails.getLastName(),
-                roles));
+            return ResponseEntity.ok(new JwtResponse(jwt,
+                    userDetails.getId(),
+                    userDetails.getEmail(),
+                    userDetails.getFirstName(),
+                    userDetails.getLastName(),
+                    roles));
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            System.out.println("LOGIN FAILED: " + e.getMessage());
+            return ResponseEntity.status(401).body(new MessageResponse("Error: Invalid username or password"));
+        }
     }
 
     @PostMapping("/register")

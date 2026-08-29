@@ -1,0 +1,59 @@
+package com.leadsphere.crm.patterns;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class NotificationService {
+  private static final Logger LOGGER = LoggerFactory.getLogger(NotificationService.class);
+
+  public void handleMessage(Message message) {
+    LOGGER.info(
+        "Notification Service received message [{}]: {}", message.getId(), message.getContent());
+
+    if (message.getContent().contains("Order Created")) {
+      sendOrderConfirmation(message);
+    } else if (message.getContent().contains("Order Updated")) {
+      sendOrderUpdate(message);
+    } else if (message.getContent().contains("Order Cancelled")) {
+      sendCancellationNotice(message);
+    } else {
+      LOGGER.debug("No notification action needed for: {}", message.getContent());
+    }
+  }
+
+  private void sendOrderConfirmation(Message message) {
+    LOGGER.info("Sending order confirmation for message: {}", message.getId());
+    // Simulate sending email/SMS notification to customer
+    try {
+      Thread.sleep(50);
+      LOGGER.info("Order confirmation sent successfully for: {}", message.getContent());
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      LOGGER.error("Notification send interrupted", e);
+    }
+  }
+
+  private void sendOrderUpdate(Message message) {
+    LOGGER.info("Sending order update notification for message: {}", message.getId());
+    // Simulate sending update notification
+    try {
+      Thread.sleep(50);
+      LOGGER.info("Order update notification sent successfully for: {}", message.getContent());
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      LOGGER.error("Notification send interrupted", e);
+    }
+  }
+
+  private void sendCancellationNotice(Message message) {
+    LOGGER.info("Sending cancellation notice for message: {}", message.getId());
+    // Simulate sending cancellation notification
+    try {
+      Thread.sleep(50);
+      LOGGER.info("Cancellation notice sent successfully for: {}", message.getContent());
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      LOGGER.error("Notification send interrupted", e);
+    }
+  }
+}

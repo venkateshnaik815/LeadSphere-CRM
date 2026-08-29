@@ -1,0 +1,20 @@
+package com.leadsphere.crm.patterns;
+
+import com.iluwatar.masterworker.Input;
+import com.iluwatar.masterworker.Result;
+import com.iluwatar.masterworker.system.systemmaster.Master;
+
+public abstract class MasterWorker {
+  private final Master master;
+
+  public MasterWorker(int numOfWorkers) {
+    this.master = setMaster(numOfWorkers);
+  }
+
+  abstract Master setMaster(int numOfWorkers);
+
+  public Result<?> getResult(Input<?> input) {
+    this.master.doWork(input);
+    return this.master.getFinalResult();
+  }
+}

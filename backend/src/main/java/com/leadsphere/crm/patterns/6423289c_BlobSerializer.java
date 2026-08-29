@@ -1,0 +1,39 @@
+package com.leadsphere.crm.patterns;
+
+import com.iluwatar.slob.lob.Forest;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.sql.SQLException;
+
+public class BlobSerializer extends LobSerializer {
+
+  public static final String TYPE_OF_DATA_FOR_DB = "BINARY";
+
+  public BlobSerializer() throws SQLException {
+    super(TYPE_OF_DATA_FOR_DB);
+  }
+
+  @Override
+  public Object serialize(Forest toSerialize) throws IOException {
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    ObjectOutputStream oos = new ObjectOutputStream(baos);
+    oos.writeObject(toSerialize);
+    oos.close();
+    return new ByteArrayInputStream(baos.toByteArray());
+  }
+
+  @Override
+  public Forest deSerialize(Object toDeserialize) throws IOException, ClassNotFoundException {
+    InputStream bis = (InputStream) toDeserialize;
+    Forest forest;
+    try (ObjectInput in = new ObjectInputStream(bis)) {
+      forest = (Forest) in.readObject();
+    }
+    return forest;
+  }
+}

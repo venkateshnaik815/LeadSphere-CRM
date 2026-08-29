@@ -1,0 +1,71 @@
+package com.leadsphere.crm.patterns;
+
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.Serial;
+import java.util.stream.IntStream;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.SwingUtilities;
+import javax.swing.WindowConstants;
+import javax.swing.table.DefaultTableModel;
+
+public class Target extends JFrame { // NOSONAR
+
+  @Serial private static final long serialVersionUID = 1L;
+
+  private final JTable jt;
+  private final DefaultTableModel dtm;
+  private final JButton del;
+
+  public Target() {
+    super("Order System");
+    setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    setSize(640, 480);
+    dtm =
+        new DefaultTableModel(
+            new Object[] {"Name", "Contact Number", "Address", "Deposit Number", "Order"}, 0);
+    jt = new JTable(dtm);
+    del = new JButton("Delete");
+    setup();
+  }
+
+  private void setup() {
+    setLayout(new BorderLayout());
+    var bot = new JPanel();
+    add(jt.getTableHeader(), BorderLayout.NORTH);
+    bot.setLayout(new BorderLayout());
+    bot.add(del, BorderLayout.EAST);
+    add(bot, BorderLayout.SOUTH);
+    var jsp = new JScrollPane(jt);
+    jsp.setPreferredSize(new Dimension(500, 250));
+    add(jsp, BorderLayout.CENTER);
+
+    del.addActionListener(new TargetListener());
+
+    var rootPane = SwingUtilities.getRootPane(del);
+    rootPane.setDefaultButton(del);
+    setVisible(true);
+  }
+
+  public void execute(String[] request) {
+    dtm.addRow(new Object[] {request[0], request[1], request[2], request[3], request[4]});
+  }
+
+  class TargetListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+      var temp = jt.getSelectedRow();
+      if (temp == -1) {
+        return;
+      }
+      var temp2 = jt.getSelectedRowCount();
+      IntStream.range(0, temp2).forEach(i -> dtm.removeRow(temp));
+    }
+  }
+}

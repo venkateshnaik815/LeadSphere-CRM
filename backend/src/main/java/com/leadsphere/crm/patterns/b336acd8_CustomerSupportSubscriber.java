@@ -1,0 +1,25 @@
+package com.leadsphere.crm.patterns;
+
+import com.iluwatar.publish.subscribe.model.Message;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Slf4j
+public class CustomerSupportSubscriber implements Subscriber {
+
+  private static final Logger logger = LoggerFactory.getLogger(CustomerSupportSubscriber.class);
+
+  @Override
+  public void onMessage(Message message) {
+    if (message.content() instanceof String content) {
+      logger.info(
+          "Customer Support Subscriber: {} sent the email to: {}", this.hashCode(), content);
+    } else {
+      logger.error(
+          "Unknown content type: {} expected: {}",
+          message.content().getClass().getSimpleName(),
+          String.class.getSimpleName());
+    }
+  }
+}

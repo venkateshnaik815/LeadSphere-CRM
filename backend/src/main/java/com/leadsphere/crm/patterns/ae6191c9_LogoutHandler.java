@@ -1,0 +1,58 @@
+package com.leadsphere.crm.patterns;
+
+import com.sun.net.httpserver.HttpExchange;
+import com.sun.net.httpserver.HttpHandler;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.time.Instant;
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class LogoutHandler implements HttpHandler {
+
+  private Map<String, Integer> sessions;
+  private Map<String, Instant> sessionCreationTimes;
+
+  public LogoutHandler(Map<String, Integer> sessions, Map<String, Instant> sessionCreationTimes) {
+    this.sessions = sessions;
+    this.sessionCreationTimes = sessionCreationTimes;
+  }
+
+  @Override
+  public void handle(HttpExchange exchange) {
+    // Get session ID from cookie
+    String sessionId = exchange.getRequestHeaders().getFirst("Cookie").replace("sessionID=", "");
+    String currentSessionId = sessions.get(sessionId) == null ? null : sessionId;
+
+    // Send response
+
+    String response = "";
+    if (currentSessionId == null) {
+      response += "Session has already expired!";
+    } else {
+      response = "Logout successful!\n" + "Session ID: " + currentSessionId;
+    }
+
+    // Remove session
+    if (currentSessionId != null) {
+      LOGGER.info("User " + sessions.get(currentSessionId) + " deleted!");
+    } else {
+      LOGGER.info("User already deleted!");
+    }
+    sessions.remove(sessionId);
+    sessionCreationTimes.remove(sessionId);
+
+    try {
+      exchange.sendResponseHeaders(200, response.length());
+    } catch (IOException e) {
+      LOGGER.error("An error has occurred: ", e);
+    }
+
+    try (OutputStream os = exchange.getResponseBody()) {
+      os.write(response.getBytes());
+    } catch (IOException e) {
+      LOGGER.error("An error has occurred: ", e);
+    }
+  }
+}

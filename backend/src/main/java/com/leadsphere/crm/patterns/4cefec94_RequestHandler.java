@@ -1,0 +1,46 @@
+package com.leadsphere.crm.patterns;
+
+import java.security.SecureRandom;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+public class RequestHandler {
+  private final String token;
+
+  public RequestHandler(String token) {
+    this.token = token;
+  }
+
+  public void process() {
+    LOGGER.info("Start handling request with token: {}", token);
+
+    try {
+      // Step 1: Parse token to get userId
+      Long userId = parseToken(token);
+
+      // Step 2: Save userId in ThreadLocal storage
+      UserContextProxy.set(new UserContext(userId));
+
+      // Simulate delay between stages of request handling
+      Thread.sleep(200);
+
+      // Step 3: Retrieve userId later in the request flow
+      Long retrievedId = UserContextProxy.get().getUserId();
+      SecureRandom random = new SecureRandom();
+      String accountInfo = retrievedId + "'s account: " + random.nextInt(400);
+      LOGGER.info(accountInfo);
+
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+    } finally {
+      // Step 4: Clear ThreadLocal to avoid potential memory leaks
+      UserContextProxy.clear();
+    }
+  }
+
+  private Long parseToken(String token) {
+    // token format: "Token::1234"
+    String[] parts = token.split("::");
+    return (parts.length == 2) ? Long.parseLong(parts[1]) : -1L;
+  }
+}

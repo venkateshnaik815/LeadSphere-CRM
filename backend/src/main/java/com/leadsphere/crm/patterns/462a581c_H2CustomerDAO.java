@@ -1,0 +1,144 @@
+package com.leadsphere.crm.patterns;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import javax.sql.DataSource;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
+@RequiredArgsConstructor
+public class H2CustomerDAO implements CustomerDAO<Long> {
+  private final DataSource dataSource;
+  private static final String INSERT_CUSTOMER = "INSERT INTO customer(id, name) VALUES (?, ?)";
+  private static final String UPDATE_CUSTOMER = "UPDATE customer SET name = ? WHERE id = ?";
+  private static final String DELETE_CUSTOMER = "DELETE FROM customer WHERE id = ?";
+  private static final String SELECT_CUSTOMER_BY_ID =
+      "SELECT customer.id, customer.name FROM customer WHERE id= ?";
+  private static final String SELECT_ALL_CUSTOMERS = "SELECT customer.* FROM customer";
+  private static final String CREATE_SCHEMA =
+      "CREATE TABLE IF NOT EXISTS customer (id BIGINT PRIMARY KEY, name VARCHAR(255))";
+  private static final String DROP_SCHEMA = "DROP TABLE IF EXISTS customer";
+
+  @Override
+  public void save(Customer<Long> customer) {
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement saveStatement = connection.prepareStatement(INSERT_CUSTOMER)) {
+      saveStatement.setLong(1, customer.getId());
+      saveStatement.setString(2, customer.getName());
+      saveStatement.execute();
+    } catch (SQLException e) {
+      throw new CustomException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public void update(Customer<Long> customer) {
+    if (Objects.isNull(customer) || Objects.isNull(customer.getId())) {
+      throw new CustomException("Custome null or customer id null");
+    }
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement selectStatement = connection.prepareStatement(SELECT_CUSTOMER_BY_ID);
+        PreparedStatement updateStatement = connection.prepareStatement(UPDATE_CUSTOMER)) {
+      selectStatement.setLong(1, customer.getId());
+      try (ResultSet resultSet = selectStatement.executeQuery()) {
+        if (!resultSet.next()) {
+          throw new CustomException("Customer not found with id: " + customer.getId());
+        }
+      }
+      updateStatement.setString(1, customer.getName());
+      updateStatement.setLong(2, customer.getId());
+      updateStatement.executeUpdate();
+    } catch (SQLException e) {
+      throw new CustomException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public void delete(Long id) {
+    if (Objects.isNull(id)) {
+      throw new CustomException("Customer id null");
+    }
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement selectStatement = connection.prepareStatement(SELECT_CUSTOMER_BY_ID);
+        PreparedStatement deleteStatement = connection.prepareStatement(DELETE_CUSTOMER)) {
+      selectStatement.setLong(1, id);
+      try (ResultSet resultSet = selectStatement.executeQuery()) {
+        if (!resultSet.next()) {
+          throw new CustomException("Customer not found with id: " + id);
+        }
+      }
+      deleteStatement.setLong(1, id);
+      deleteStatement.execute();
+    } catch (SQLException e) {
+      throw new CustomException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public List<Customer<Long>> findAll() {
+    List<Customer<Long>> customers = new LinkedList<>();
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement selectStatement = connection.prepareStatement(SELECT_ALL_CUSTOMERS)) {
+      try (ResultSet resultSet = selectStatement.executeQuery()) {
+        while (resultSet.next()) {
+          Long idCustomer = resultSet.getLong("id");
+          String nameCustomer = resultSet.getString("name");
+          customers.add(new Customer<>(idCustomer, nameCustomer));
+        }
+      }
+    } catch (SQLException e) {
+      throw new CustomException(e.getMessage(), e);
+    }
+    return customers;
+  }
+
+  @Override
+  public Optional<Customer<Long>> findById(Long id) {
+    if (Objects.isNull(id)) {
+      throw new CustomException("Customer id null");
+    }
+    Customer<Long> customer = null;
+    try (Connection connection = dataSource.getConnection();
+        PreparedStatement selectByIdStatement =
+            connection.prepareStatement(SELECT_CUSTOMER_BY_ID)) {
+      selectByIdStatement.setLong(1, id);
+      try (ResultSet resultSet = selectByIdStatement.executeQuery()) {
+        while (resultSet.next()) {
+          Long idCustomer = resultSet.getLong("id");
+          String nameCustomer = resultSet.getString("name");
+          customer = new Customer<>(idCustomer, nameCustomer);
+        }
+      }
+    } catch (SQLException e) {
+      throw new CustomException(e.getMessage(), e);
+    }
+    return Optional.ofNullable(customer);
+  }
+
+  public void createSchema() {
+    try (Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement()) {
+      statement.execute(CREATE_SCHEMA);
+    } catch (SQLException e) {
+      throw new CustomException(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public void deleteSchema() {
+    try (Connection connection = dataSource.getConnection();
+        Statement statement = connection.createStatement(); ) {
+      statement.execute(DROP_SCHEMA);
+    } catch (SQLException e) {
+      throw new CustomException(e.getMessage(), e);
+    }
+  }
+}

@@ -1,0 +1,16 @@
+package com.leadsphere.crm.patterns;
+
+import com.iluwatar.masterworker.system.systemmaster.ArrayTransposeMaster;
+import com.iluwatar.masterworker.system.systemmaster.Master;
+
+public class ArrayTransposeMasterWorker extends MasterWorker {
+
+  public ArrayTransposeMasterWorker() {
+    super(4);
+  }
+
+  @Override
+  Master setMaster(int numOfWorkers) {
+    return new ArrayTransposeMaster(numOfWorkers);
+  }
+}

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: leadsphere-postgres
+    environment:
+      POSTGRES_USER: leadsphere
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: leadsphere_crm
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - leadsphere-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: leadsphere-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - leadsphere-net
+
+volumes:
+  pgdata:
+
+networks:
+  leadsphere-net:
+    driver: bridge
